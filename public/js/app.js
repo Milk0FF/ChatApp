@@ -20753,7 +20753,28 @@ __webpack_require__.r(__webpack_exports__);
       messages: []
     };
   },
+  watch: {
+    currentRoom: function currentRoom(val, oldVal) {
+      if (oldVal.id) {
+        this.disconnect(oldVal);
+      }
+
+      this.connect();
+    }
+  },
   methods: {
+    connect: function connect() {
+      if (this.currentRoom.id) {
+        var vm = this;
+        this.getMessages();
+        window.Echo["private"]('chat.' + this.currentRoom.id).listen('.message.new', function (e) {
+          vm.getMessages();
+        });
+      }
+    },
+    disconnect: function disconnect(room) {
+      window.Echo.leave("chat." + room.id);
+    },
     getRooms: function getRooms() {
       var _this = this;
 
@@ -26261,8 +26282,8 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 window.Pusher = __webpack_require__(/*! pusher-js */ "./node_modules/pusher-js/dist/web/pusher.js");
 window.Echo = new laravel_echo__WEBPACK_IMPORTED_MODULE_0__["default"]({
   broadcaster: 'pusher',
-  key: "",
-  cluster: "mt1",
+  key: "750d979dbc498f389267",
+  cluster: "ap2",
   forceTLS: true
 });
 

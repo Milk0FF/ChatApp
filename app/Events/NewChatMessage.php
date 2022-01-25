@@ -14,6 +14,7 @@ use App\Models\ChatMessage;
 class NewChatMessage
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
+
     public $chatMessage;
     /**
      * Create a new event instance.
