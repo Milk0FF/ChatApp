@@ -26,3 +26,16 @@ Broadcast::channel('chat.{roomId}', function ($user, $roomId) {
         ];
     }
 });
+Broadcast::channel('user', function ($user) {
+    if(Auth::check()){
+        return [
+            'id' => $user->id,
+            'name' => $user->name
+        ];
+    }
+});
+Broadcast::channel('user.{recipientId}', function ($user, $recipientId) {
+    if(!Auth::check())
+        return false;
+    return (int) $recipientId === $user->id;
+});

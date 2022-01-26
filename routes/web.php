@@ -34,3 +34,5 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/chat', function () {
 Route::middleware('auth:sanctum')->get('/chat/rooms', [ChatController::class, 'rooms']);
 Route::middleware('auth:sanctum')->get('/chat/room/{room_id}/messages', [ChatController::class, 'messages']);
 Route::middleware('auth:sanctum')->post('/chat/room/{room_id}/message', [ChatController::class, 'newMessage']);
+Route::middleware('auth:sanctum')->get('/user/notificate/{recipient_id}', [ChatController::class, 'notificateNewUser']);
+Route::middleware('auth:sanctum')->get('/current-user', [ChatController::class, 'getUser']);

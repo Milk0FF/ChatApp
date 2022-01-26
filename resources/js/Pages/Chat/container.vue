@@ -17,6 +17,27 @@
                     <input-message :room="currentRoom"
                                    @messageSent="getMessages"/>
                 </div>
+                <!-- <modal :show='showingModal'>
+                    <template #title>
+                        Добавился новый пользователь c ником {{ newUser.name }}!
+                    </template>
+
+                    <template #content>
+                        Хотите отправить ему привет?
+                    </template>
+                    <template #footer>
+                        <button @click="showingModal=false">
+                            Не отправлять
+                        </button>
+                        <danger-button class="ml-3" @click="sendHelloNewUser">
+                            Отправить
+                        </danger-button>
+
+                        <danger-button class="ml-3" :class="{ 'opacity-25': deleteApiTokenForm.processing }" :disabled="deleteApiTokenForm.processing">
+                            Не отправлять
+                        </danger-button>
+                    </template>
+                </modal> -->
             </div>
         </div>
     </app-layout>
@@ -28,6 +49,10 @@
     import InputMessage from './inputMessage.vue'
     import MessageContainer from './messageContainer.vue'
     import ChatRoomSelection from './chatRoomSelection.vue'
+    import Modal from '../../Jetstream/ConfirmationModal.vue';
+    import Button from '../../Jetstream/SecondaryButton.vue';
+    import DangerButton from '../../Jetstream/DangerButton.vue';
+
 
     export default defineComponent({
         components: {
@@ -35,12 +60,21 @@
             MessageContainer,
             InputMessage,
             ChatRoomSelection,
+            Modal,
+            Button,
+            DangerButton,
         },
         data(){
             return {
                 chatRooms: [],
                 currentRoom: [],
                 messages: [],
+                showingModal: false,
+                showingModal: true,
+                newUser: {
+                    name: 'ivan',
+                    id: 14,
+                },
             }
         },
         watch:{
@@ -57,11 +91,28 @@
                     let vm = this;
                     this.getMessages();
                     window.Echo.private('chat.' + this.currentRoom.id)
-                    .listen('.message.new', e => {
+                    .listen('.message.new', (e) => {
                         vm.getMessages();
                     });
                 }
             },
+            // sendHelloNewUser(){
+            //     this.showingModal = false;
+            //     axios.get('/user/notificate/' + this.newUser.id)
+            //     .then( res => {
+            //         console.log('Succcess');
+            //     })
+            //     .catch(error => {
+            //         console.log(error);
+            //     });
+            // },
+            // watchingCreateUser(){
+            //     window.Echo.private('user')
+            //         .listen('.user.new', (e) => {
+            //             this.newUser = e;
+            //             this.showingModal = true;
+            //         })
+            // },
             disconnect(room){
                 window.Echo.leave("chat." + room.id);
             },
@@ -91,6 +142,7 @@
         },
         created(){
             this.getRooms();
+            // this.watchingCreateUser();
         }
     })
 </script>

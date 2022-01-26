@@ -20056,6 +20056,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Jetstream_NavLink_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/Jetstream/NavLink.vue */ "./resources/js/Jetstream/NavLink.vue");
 /* harmony import */ var _Jetstream_ResponsiveNavLink_vue__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/Jetstream/ResponsiveNavLink.vue */ "./resources/js/Jetstream/ResponsiveNavLink.vue");
 /* harmony import */ var _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @inertiajs/inertia-vue3 */ "./node_modules/@inertiajs/inertia-vue3/dist/index.js");
+/* harmony import */ var _Jetstream_ConfirmationModal_vue__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/Jetstream/ConfirmationModal.vue */ "./resources/js/Jetstream/ConfirmationModal.vue");
+/* harmony import */ var _Jetstream_SecondaryButton_vue__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @/Jetstream/SecondaryButton.vue */ "./resources/js/Jetstream/SecondaryButton.vue");
+/* harmony import */ var _Jetstream_DangerButton_vue__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @/Jetstream/DangerButton.vue */ "./resources/js/Jetstream/DangerButton.vue");
+
+
+
 
 
 
@@ -20076,11 +20082,19 @@ __webpack_require__.r(__webpack_exports__);
     JetDropdownLink: _Jetstream_DropdownLink_vue__WEBPACK_IMPORTED_MODULE_4__["default"],
     JetNavLink: _Jetstream_NavLink_vue__WEBPACK_IMPORTED_MODULE_5__["default"],
     JetResponsiveNavLink: _Jetstream_ResponsiveNavLink_vue__WEBPACK_IMPORTED_MODULE_6__["default"],
-    Link: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_7__.Link
+    Link: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_7__.Link,
+    Modal: _Jetstream_ConfirmationModal_vue__WEBPACK_IMPORTED_MODULE_8__["default"],
+    Button: _Jetstream_SecondaryButton_vue__WEBPACK_IMPORTED_MODULE_9__["default"],
+    DangerButton: _Jetstream_DangerButton_vue__WEBPACK_IMPORTED_MODULE_10__["default"]
   },
   data: function data() {
     return {
-      showingNavigationDropdown: false
+      showingNavigationDropdown: false,
+      currentUser: {},
+      senderUser: {},
+      newUser: {},
+      greetingModal: false,
+      newUserModal: false
     };
   },
   methods: {
@@ -20093,7 +20107,46 @@ __webpack_require__.r(__webpack_exports__);
     },
     logout: function logout() {
       this.$inertia.post(route('logout'));
+    },
+    listenGreetings: function listenGreetings() {
+      var _this = this;
+
+      window.Echo["private"]('user.' + this.currentUser.id).listen('.user.notify', function (e) {
+        _this.senderUser = e;
+        _this.greetingModal = true;
+      });
+    },
+    listenCreateUser: function listenCreateUser() {
+      var _this2 = this;
+
+      window.Echo["private"]('user').listen('.user.new', function (e) {
+        _this2.newUser = e;
+        _this2.newUserModal = true;
+      });
+    },
+    getAuthUser: function getAuthUser() {
+      var _this3 = this;
+
+      axios.get('/current-user').then(function (res) {
+        _this3.currentUser = res.data;
+
+        _this3.listenGreetings();
+      })["catch"](function (err) {
+        console.log(err);
+      });
+    },
+    sendHelloNewUser: function sendHelloNewUser() {
+      this.newUserModal = false;
+      axios.get('/user/notificate/' + this.newUser.id).then(function (res) {
+        console.log('Success');
+      })["catch"](function (error) {
+        console.log(error);
+      });
     }
+  },
+  created: function created() {
+    this.getAuthUser();
+    this.listenCreateUser();
   }
 }));
 
@@ -20734,6 +20787,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _inputMessage_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./inputMessage.vue */ "./resources/js/Pages/Chat/inputMessage.vue");
 /* harmony import */ var _messageContainer_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./messageContainer.vue */ "./resources/js/Pages/Chat/messageContainer.vue");
 /* harmony import */ var _chatRoomSelection_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./chatRoomSelection.vue */ "./resources/js/Pages/Chat/chatRoomSelection.vue");
+/* harmony import */ var _Jetstream_ConfirmationModal_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../Jetstream/ConfirmationModal.vue */ "./resources/js/Jetstream/ConfirmationModal.vue");
+/* harmony import */ var _Jetstream_SecondaryButton_vue__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../Jetstream/SecondaryButton.vue */ "./resources/js/Jetstream/SecondaryButton.vue");
+/* harmony import */ var _Jetstream_DangerButton_vue__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../Jetstream/DangerButton.vue */ "./resources/js/Jetstream/DangerButton.vue");
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
+
+
 
 
 
@@ -20744,14 +20805,23 @@ __webpack_require__.r(__webpack_exports__);
     AppLayout: _Layouts_AppLayout_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
     MessageContainer: _messageContainer_vue__WEBPACK_IMPORTED_MODULE_3__["default"],
     InputMessage: _inputMessage_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
-    ChatRoomSelection: _chatRoomSelection_vue__WEBPACK_IMPORTED_MODULE_4__["default"]
+    ChatRoomSelection: _chatRoomSelection_vue__WEBPACK_IMPORTED_MODULE_4__["default"],
+    Modal: _Jetstream_ConfirmationModal_vue__WEBPACK_IMPORTED_MODULE_5__["default"],
+    Button: _Jetstream_SecondaryButton_vue__WEBPACK_IMPORTED_MODULE_6__["default"],
+    DangerButton: _Jetstream_DangerButton_vue__WEBPACK_IMPORTED_MODULE_7__["default"]
   },
   data: function data() {
-    return {
+    var _ref;
+
+    return _ref = {
       chatRooms: [],
       currentRoom: [],
-      messages: []
-    };
+      messages: [],
+      showingModal: false
+    }, _defineProperty(_ref, "showingModal", true), _defineProperty(_ref, "newUser", {
+      name: 'ivan',
+      id: 14
+    }), _ref;
   },
   watch: {
     currentRoom: function currentRoom(val, oldVal) {
@@ -20772,6 +20842,23 @@ __webpack_require__.r(__webpack_exports__);
         });
       }
     },
+    // sendHelloNewUser(){
+    //     this.showingModal = false;
+    //     axios.get('/user/notificate/' + this.newUser.id)
+    //     .then( res => {
+    //         console.log('Succcess');
+    //     })
+    //     .catch(error => {
+    //         console.log(error);
+    //     });
+    // },
+    // watchingCreateUser(){
+    //     window.Echo.private('user')
+    //         .listen('.user.new', (e) => {
+    //             this.newUser = e;
+    //             this.showingModal = true;
+    //         })
+    // },
     disconnect: function disconnect(room) {
       window.Echo.leave("chat." + room.id);
     },
@@ -20801,7 +20888,7 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   created: function created() {
-    this.getRooms();
+    this.getRooms(); // this.watchingCreateUser();
   }
 }));
 
@@ -22959,6 +23046,11 @@ var _hoisted_63 = {
 var _hoisted_64 = {
   "class": "max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8"
 };
+
+var _hoisted_65 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Хотите отправить ему привет? ");
+
+var _hoisted_66 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Отправить ");
+
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Head = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Head");
 
@@ -22975,6 +23067,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_jet_dropdown = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("jet-dropdown");
 
   var _component_jet_responsive_nav_link = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("jet-responsive-nav-link");
+
+  var _component_modal = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("modal");
+
+  var _component_danger_button = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("danger-button");
 
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Head, {
     title: _ctx.title
@@ -23305,7 +23401,62 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* STABLE_FRAGMENT */
   )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])], 2
   /* CLASS */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Page Heading "), _ctx.$slots.header ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("header", _hoisted_63, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_64, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "header")])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Page Content "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("main", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "default")])])]);
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Page Heading "), _ctx.$slots.header ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("header", _hoisted_63, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_64, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "header")])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Page Content "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("main", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "default")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_modal, {
+    show: _ctx.greetingModal
+  }, {
+    title: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Пользователь с ником " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.senderUser.name) + " передаёт вам привет! ", 1
+      /* TEXT */
+      )];
+    }),
+    footer: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        onClick: _cache[3] || (_cache[3] = function ($event) {
+          return _ctx.greetingModal = false;
+        })
+      }, " Закрыть ")];
+    }),
+    _: 1
+    /* STABLE */
+
+  }, 8
+  /* PROPS */
+  , ["show"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_modal, {
+    show: _ctx.newUserModal
+  }, {
+    title: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Добавился новый пользователь c ником " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.newUser.name) + "! ", 1
+      /* TEXT */
+      )];
+    }),
+    content: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [_hoisted_65];
+    }),
+    footer: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        onClick: _cache[4] || (_cache[4] = function ($event) {
+          return _ctx.newUserModal = false;
+        })
+      }, " Не отправлять "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_danger_button, {
+        "class": "ml-3",
+        onClick: _ctx.sendHelloNewUser
+      }, {
+        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [_hoisted_66];
+        }),
+        _: 1
+        /* STABLE */
+
+      }, 8
+      /* PROPS */
+      , ["onClick"])];
+    }),
+    _: 1
+    /* STABLE */
+
+  }, 8
+  /* PROPS */
+  , ["show"])])]);
 }
 
 /***/ }),
@@ -24797,7 +24948,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         onMessageSent: _ctx.getMessages
       }, null, 8
       /* PROPS */
-      , ["room", "onMessageSent"])])])])];
+      , ["room", "onMessageSent"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <modal :show='showingModal'>\n                    <template #title>\n                        Добавился новый пользователь c ником {{ newUser.name }}!\n                    </template>\n\n                    <template #content>\n                        Хотите отправить ему привет?\n                    </template>\n                    <template #footer>\n                        <button @click=\"showingModal=false\">\n                            Не отправлять\n                        </button>\n                        <danger-button class=\"ml-3\" @click=\"sendHelloNewUser\">\n                            Отправить\n                        </danger-button>\n\n                        <danger-button class=\"ml-3\" :class=\"{ 'opacity-25': deleteApiTokenForm.processing }\" :disabled=\"deleteApiTokenForm.processing\">\n                            Не отправлять\n                        </danger-button>\n                    </template>\n                </modal> ")])])];
     }),
     _: 1
     /* STABLE */

@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\HelloNewUser;
 use App\Events\NewChatMessage;
 use Illuminate\Http\Request;
 use App\Models\ChatRoom;
 use App\Models\ChatMessage;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class ChatController extends Controller
@@ -28,5 +30,15 @@ class ChatController extends Controller
         $newMessage->save();
         broadcast(new NewChatMessage($newMessage))->toOthers();
         return $newMessage;
+    }
+    public function notificateNewUser($recipientId)
+    {
+        $sender = Auth::user();
+        $recipient = User::find($recipientId);
+        broadcast(new HelloNewUser($sender, $recipient))->toOthers();
+    }
+    public function getUser()
+    {
+        return Auth::user();
     }
 }

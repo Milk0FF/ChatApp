@@ -233,6 +233,33 @@
             <main>
                 <slot></slot>
             </main>
+            <modal :show='greetingModal'>
+                <template #title>
+                    Пользователь с ником {{ senderUser.name }} передаёт вам привет!
+                </template>
+                <template #footer>
+                    <button @click="greetingModal=false">
+                        Закрыть
+                    </button>
+                </template>
+            </modal>
+            <modal :show='newUserModal'>
+                <template #title>
+                    Добавился новый пользователь c ником {{ newUser.name }}!
+                </template>
+
+                <template #content>
+                    Хотите отправить ему привет?
+                </template>
+                <template #footer>
+                    <button @click="newUserModal=false">
+                        Не отправлять
+                    </button>
+                    <danger-button class="ml-3" @click="sendHelloNewUser">
+                        Отправить
+                    </danger-button>
+                </template>
+            </modal>
         </div>
     </div>
 </template>
@@ -246,6 +273,9 @@
     import JetNavLink from '@/Jetstream/NavLink.vue'
     import JetResponsiveNavLink from '@/Jetstream/ResponsiveNavLink.vue'
     import { Head, Link } from '@inertiajs/inertia-vue3';
+    import Modal from '@/Jetstream/ConfirmationModal.vue';
+    import Button from '@/Jetstream/SecondaryButton.vue';
+    import DangerButton from '@/Jetstream/DangerButton.vue';
 
     export default defineComponent({
         props: {
@@ -261,11 +291,19 @@
             JetNavLink,
             JetResponsiveNavLink,
             Link,
+            Modal,
+            Button,
+            DangerButton,
         },
 
         data() {
             return {
                 showingNavigationDropdown: false,
+                currentUser: {},
+                senderUser: {},
+                newUser : {},
+                greetingModal: false,
+                newUserModal: false,
             }
         },
 
@@ -277,10 +315,48 @@
                     preserveState: false
                 })
             },
-
             logout() {
                 this.$inertia.post(route('logout'));
             },
-        }
+            listenGreetings(){
+                window.Echo.private('user.' + this.currentUser.id)
+                .listen('.user.notify', (e) => {
+                    this.senderUser = e;
+                    this.greetingModal = true;
+                })
+            },
+            listenCreateUser(){
+                window.Echo.private('user')
+                .listen('.user.new', (e) => {
+                    this.newUser = e;
+                    this.newUserModal = true;
+                });
+            },
+            getAuthUser(){
+                axios.get('/current-user')
+                .then(res => {
+                    this.currentUser = res.data;
+                    this.listenGreetings();
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+            },
+            sendHelloNewUser(){
+                this.newUserModal = false;
+                axios.get('/user/notificate/' + this.newUser.id)
+                    .then( res => {
+                        console.log('Success');
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+            },
+        },
+        created(){
+            this.getAuthUser();
+            this.listenCreateUser();
+        },
+
     })
 </script>
